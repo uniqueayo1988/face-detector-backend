@@ -27,7 +27,7 @@ const database = {
 }
 
 app.get('/', (req, res) => {
-  res.send('hello')
+  res.send(database.users)
 })
 
 app.post('/signin', (req, res) => {
@@ -53,11 +53,27 @@ app.post('/register', (req, res) => {
   // res.json(database.users[database.users.length - 1])
 })
 
+app.get('/profile/:id', (req, res) => {
+  const {id} = req.params
+  database.users.forEach(user => {
+    if (user.id === id) {
+      return res.json(user)
+    }
+  })
+  return res.status(404).json('no such user')
+})
+
+app.put('/image', (req, res) => {
+  const {id} = req.body
+  database.users.forEach(user => {
+    if (user.id === id) {
+      user.entries++
+      return res.json(user.entries)
+    }
+  })
+  return res.status(404).json('no such user')  
+})
+
 app.listen('8080', () => {
   console.log('App is running on port 8080')
 })
-
-/*
-/profile/:userId --> GET = user
-/image --> PUT --> user
-*/
