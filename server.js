@@ -1,17 +1,20 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt');
+const cors = require('cors')
 
 const app = express()
 const pwd = "$2b$10$mNyFBde5JrtsnFV0mLprG.q9isC2qcp3Qya1RYfTbLQfwrwGrSn6y"
 
 app.use(bodyParser.json())
+app.use(cors())
 
 const database = {
   users: [
     {
       id: '123',
       name: 'John',
+      password: 'cookies',
       email: 'john@gmail.com',
       password: 'cookies',
       entries: 0,
@@ -20,19 +23,20 @@ const database = {
     {
       id: '124',
       name: 'Sally',
+      password: 'bananas',
       email: 'sally@gmail.com',
       password: 'bananas',
       entries: 0,
       joined: new Date()
     }
   ],
-  password: [
-    {
-      id: '',
-      hash: '',
-      email: ''
-    }
-  ]
+  // password: [
+  //   {
+  //     id: '',
+  //     hash: '',
+  //     email: ''
+  //   }
+  // ]
 }
 
 app.get('/', (req, res) => {
@@ -40,14 +44,14 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signin', (req, res) => {
-bcrypt.compare("orange", pwd, function(err, res) {
-  console.log(res, '.....response')
-    // res == true
-});
-bcrypt.compare("someOtherPlainte", pwd, function(err, res) {
-    // res == false
-    console.log(res, '.....respons two')
-});
+  // bcrypt.compare("orange", pwd, function(err, res) {
+  //   console.log(res, '.....response')
+  //     // res == true
+  // });
+  // bcrypt.compare("someOtherPlainte", pwd, function(err, res) {
+  //     // res == false
+  //     console.log(res, '.....respons two')
+  // });
 
   if (req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
     res.json('Success')
