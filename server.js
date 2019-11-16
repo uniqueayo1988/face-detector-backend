@@ -14,7 +14,6 @@ const database = {
     {
       id: '123',
       name: 'John',
-      password: 'cookies',
       email: 'john@gmail.com',
       password: 'cookies',
       entries: 0,
@@ -23,7 +22,6 @@ const database = {
     {
       id: '124',
       name: 'Sally',
-      password: 'bananas',
       email: 'sally@gmail.com',
       password: 'bananas',
       entries: 0,
@@ -72,12 +70,11 @@ app.post('/register', (req, res) => {
     id: '125',
     name,
     email,
-    password,
     entries: 0,
     joined: new Date()
   })
-  res.json(database.users)
-  // res.json(database.users[database.users.length - 1])
+  // res.json(database.users)
+  res.json(database.users[database.users.length - 1])
 })
 
 app.get('/profile/:id', (req, res) => {
