@@ -2,6 +2,20 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const bcrypt = require('bcrypt');
 const cors = require('cors')
+const knex = require('knex')
+
+const postgres = knex({
+  client: 'pg',
+  connection: {
+    host : '127.0.0.1',
+    user : '',
+    password : '',
+    database : 'template1'
+  }
+});
+
+const test = postgres.select().table('users')
+console.log(test, '...test')
 
 const app = express()
 const pwd = "$2b$10$mNyFBde5JrtsnFV0mLprG.q9isC2qcp3Qya1RYfTbLQfwrwGrSn6y"
