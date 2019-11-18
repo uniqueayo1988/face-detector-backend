@@ -105,12 +105,19 @@ app.post('/register', (req, res) => {
 
 app.get('/profile/:id', (req, res) => {
   const {id} = req.params
-  database.users.forEach(user => {
-    if (user.id === id) {
-      return res.json(user)
-    }
-  })
-  return res.status(404).json('no such user')
+  db.select('*')
+    .from('users')
+    .where({id})
+    .then(user => {
+      if (user.length) {
+        res.json(user[0])
+      } else {
+        res.status(404).json('User does not exist')
+      }  
+    })
+    .catch(err => {
+      res.status(500).json('Server error')
+    })
 })
 
 app.put('/image', (req, res) => {
