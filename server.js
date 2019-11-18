@@ -14,10 +14,9 @@ const db = knex({
   }
 });
 
-db.select().table('users').then(data => {
-  console.log(data, '...test')
-})
-
+// db.select().table('users').then(data => {
+//   console.log(data, '...test')
+// })
 
 const app = express()
 const pwd = "$2b$10$mNyFBde5JrtsnFV0mLprG.q9isC2qcp3Qya1RYfTbLQfwrwGrSn6y"
@@ -82,12 +81,17 @@ app.post('/register', (req, res) => {
     // Store hash in your password DB.
     // console.log(hash, '...hash')
   });
-  db('users').insert({
+  db('users')
+  .returning('*')
+  .insert({
     email,
     name,
     joined: new Date()
   })
-    .then(console.log)
+    .then(user => {
+      res.json(user[0])
+    })
+    .catch(err => res.status(400).json('Unable to Register User'))
   // database.users.push({
   //   id: '125',
   //   name,
@@ -96,7 +100,7 @@ app.post('/register', (req, res) => {
   //   joined: new Date()
   // })
   // res.json(database.users)
-  res.json(database.users[database.users.length - 1])
+  // res.json(database.users[database.users.length - 1])
 })
 
 app.get('/profile/:id', (req, res) => {
