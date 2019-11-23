@@ -66,41 +66,62 @@ app.post('/signin', (req, res) => {
   //     console.log(res, '.....respons two')
   // });
 
-  if (req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
-    res.json('Success')
-  } else {
-    res.status('400').json('Error logging user in')
-  }
-  res.send('signing')
+  // if (req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
+  //   res.json('Success')
+  // } else {
+  //   res.status('400').json('Error logging user in')
+  // }
+  // res.send('signing')
+  db.select('email', 'hash').from('login')
+    .where('email', '=', req.body.email)
+    .then(data => {
+      console.log(data)
+    })
 })
 
 app.post('/register', (req, res) => {
   const {email, name, password} = req.body
 
-  bcrypt.hash(password, 10, function(err, hash) {
-    // Store hash in your password DB.
-    // console.log(hash, '...hash')
-  });
-  db('users')
-  .returning('*')
-  .insert({
-    email,
-    name,
-    joined: new Date()
-  })
-    .then(user => {
-      res.json(user[0])
+  const hash = bcrypt.hashSync(password, 10);
+
+  db.transaction(trx => {
+    trx.insert({
+      hash,
+      email
     })
-    .catch(err => res.status(400).json('Unable to Register User'))
-  // database.users.push({
-  //   id: '125',
-  //   name,
+    .into('login')
+    .returning('email')
+    .then(loginEmail => {
+      return trx('users')
+        .returning('*')
+        .insert({
+          email,
+          name,
+          joined: new Date()
+        })
+        .then(user => {
+          res.json(user[0])
+        })     
+    })
+    .then(trx.commit)
+    .catch(trx.rollback)
+  })
+
+  // bcrypt.hash(password, 10, function(err, hash) {
+  //   // Store hash in your password DB.
+  //   // console.log(hash, '...hash')
+  // });
+  // db('users')
+  // .returning('*')
+  // .insert({
   //   email,
-  //   entries: 0,
+  //   name,
   //   joined: new Date()
   // })
-  // res.json(database.users)
-  // res.json(database.users[database.users.length - 1])
+  //   .then(user => {
+  //     res.json(user[0])
+  //   })
+    .catch(err => res.status(400).json('Unable to Register User'))
 })
 
 app.get('/profile/:id', (req, res) => {
