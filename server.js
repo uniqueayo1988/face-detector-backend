@@ -14,69 +14,33 @@ const db = knex({
   }
 });
 
-// db.select().table('users').then(data => {
-//   console.log(data, '...test')
-// })
-
 const app = express()
-const pwd = "$2b$10$mNyFBde5JrtsnFV0mLprG.q9isC2qcp3Qya1RYfTbLQfwrwGrSn6y"
 
 app.use(bodyParser.json())
 app.use(cors())
-
-const database = {
-  users: [
-    {
-      id: '123',
-      name: 'John',
-      email: 'john@gmail.com',
-      password: 'cookies',
-      entries: 0,
-      joined: new Date()
-    },
-    {
-      id: '124',
-      name: 'Sally',
-      email: 'sally@gmail.com',
-      password: 'bananas',
-      entries: 0,
-      joined: new Date()
-    }
-  ],
-  // password: [
-  //   {
-  //     id: '',
-  //     hash: '',
-  //     email: ''
-  //   }
-  // ]
-}
 
 app.get('/', (req, res) => {
   res.send(database.users)
 })
 
 app.post('/signin', (req, res) => {
-  // bcrypt.compare("orange", pwd, function(err, res) {
-  //   console.log(res, '.....response')
-  //     // res == true
-  // });
-  // bcrypt.compare("someOtherPlainte", pwd, function(err, res) {
-  //     // res == false
-  //     console.log(res, '.....respons two')
-  // });
-
-  // if (req.body.email === database.users[0].email && req.body.password === database.users[0].password) {
-  //   res.json('Success')
-  // } else {
-  //   res.status('400').json('Error logging user in')
-  // }
-  // res.send('signing')
   db.select('email', 'hash').from('login')
     .where('email', '=', req.body.email)
     .then(data => {
-      console.log(data)
+      const isValid = bcrypt.compareSync(req.body.password, data[0].hash)
+      console.log(isValid, '...valid')
+      if (isValid) {
+        return db.select('*').from('users')
+          .where('email', '=', req.body.email)
+          .then(user => {
+            res.json(user[0])
+          })
+          .catch(err => res.status(400).json('Unable to get User'))
+      } else {
+        res.status(400).json('Wrong credentials')
+      }
     })
+    .catch(err => res.status(400).json('Wrong credentials'))
 })
 
 app.post('/register', (req, res) => {
@@ -106,21 +70,6 @@ app.post('/register', (req, res) => {
     .then(trx.commit)
     .catch(trx.rollback)
   })
-
-  // bcrypt.hash(password, 10, function(err, hash) {
-  //   // Store hash in your password DB.
-  //   // console.log(hash, '...hash')
-  // });
-  // db('users')
-  // .returning('*')
-  // .insert({
-  //   email,
-  //   name,
-  //   joined: new Date()
-  // })
-  //   .then(user => {
-  //     res.json(user[0])
-  //   })
     .catch(err => res.status(400).json('Unable to Register User'))
 })
 
@@ -148,14 +97,7 @@ app.put('/image', (req, res) => {
     .then(entries => {
       res.json(entries[0])
     })
-    .catch(err => res.status(400).json('Unable to update entries'))
-  // database.users.forEach(user => {
-  //   if (user.id === id) {
-  //     user.entries++
-  //     return res.json(user.entries)
-  //   }
-  // })
-  // return res.status(404).json('no such user')  
+    .catch(err => res.status(400).json('Unable to update entries')) 
 })
 
 app.listen('8080', () => {
