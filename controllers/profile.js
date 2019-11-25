@@ -11,7 +11,7 @@ const handleProfileGet = (req, res, db) => {
       }  
     })
     .catch(err => res.status(500).json('Server error'))
-})
+}
 
 module.exports = {
   handleProfileGet

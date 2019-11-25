@@ -30,6 +30,7 @@ app.get('/', (req, res) => {
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt) })
 
 app.post('/register', register.handleRegister(db, bcrypt))
+// app.post('/register', (req, res) => { register.handleRegister(db, bcrypt) })
 
 app.get('/profile/:id', (req, res) => { profile.handleProfileGet(req, res, db) })
 
@@ -38,3 +39,5 @@ app.put('/image', (req, res) => { image.handleImage(req, res, db) })
 app.listen('8080', () => {
   console.log('App is running on port 8080')
 })
+
+console.log(process.env)
