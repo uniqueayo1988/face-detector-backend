@@ -31,8 +31,8 @@ const db = knex({
       //     done(err, conn);
       //   }
       // });
-
-      conn.query('SELECT table_schema,table_name FROM information_schema.tables;', function (err, res) {
+// CREATE TABLE users (id serial PRIMARY key, name varchar(100), email text UNIQUE NOT null, entries BIGINT DEFAULT 0, joined TIMESTAMP NOT null);
+      conn.query('CREATE TABLE users (id serial PRIMARY key, name varchar(100), email text UNIQUE NOT null, entries BIGINT DEFAULT 0, joined TIMESTAMP NOT null);', function (err, res) {
         if (err) {
           console.log('There is an error in conn')
           // first query failed, return error and don't try to make next query
