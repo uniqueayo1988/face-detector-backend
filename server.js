@@ -8,19 +8,13 @@ const signin = require('./controllers/signin')
 const profile = require('./controllers/profile')
 const image = require('./controllers/image')
 const PORT = process.env.PORT || 8080
+require('dotenv').config()
 
 const db = knex({
   client: 'pg',
-  connection: {
-    // host : '127.0.0.1',
-    // user : '',
-    // password : '',
-    // database : 'template1'
-    host : 'ec2-174-129-255-76.compute-1.amazonaws.com',
-    user : 'uwsctihqxiplsv',
-    password : '479add8bb9db16574bfef35e566a8fbb2e1ea5d2e112247a1c9bff90f0660f14',
-    database : 'detnditgrq6o8q'
-  },
+  connection: process.env.DATABASE_URL,
+  searchPath: ['knex', 'public'],
+  ssl: true,
   pool: {
     afterCreate: (conn, done) => {
       conn.query('CREATE TABLE if not exists users (id serial PRIMARY key, name varchar(100), email text UNIQUE NOT null, entries BIGINT DEFAULT 0, joined TIMESTAMP NOT null);', (err) => {
@@ -28,7 +22,6 @@ const db = knex({
           console.log(err)
           done(err, conn);
         } else {
-          console.log('done')
           conn.query('CREATE TABLE if not exists login (id serial PRIMARY key, hash varchar(100) NOT null, email text UNIQUE NOT null);', (err) => {
             done(err, conn);
           })
