@@ -22,27 +22,18 @@ const db = knex({
     database : 'detnditgrq6o8q'
   },
   pool: {
-    afterCreate: function (conn, done) {
-      // in this example we use pg driver's connection API
-      // const userTable = create table `users` (`id` int unsigned not null auto_increment primary key, `name` varchar(255), `created_at` datetime, `updated_at` datetime)
-      // conn.query('SET timezone="UTC";', function (err) {
-      //   if (err) {
-      //     // first query failed, return error and don't try to make next query
-      //     done(err, conn);
-      //   }
-      // });
-// CREATE TABLE users (id serial PRIMARY key, name varchar(100), email text UNIQUE NOT null, entries BIGINT DEFAULT 0, joined TIMESTAMP NOT null);
-      conn.query('CREATE TABLE users (id serial PRIMARY key, name varchar(100), email text UNIQUE NOT null, entries BIGINT DEFAULT 0, joined TIMESTAMP NOT null);', function (err, res) {
+    afterCreate: (conn, done) => {
+      conn.query('CREATE TABLE if not exists users (id serial PRIMARY key, name varchar(100), email text UNIQUE NOT null, entries BIGINT DEFAULT 0, joined TIMESTAMP NOT null);', (err) => {
         if (err) {
-          console.log('There is an error in conn')
-          // first query failed, return error and don't try to make next query
+          console.log(err)
           done(err, conn);
-        }
-        for (let row of res.rows) {
-          console.log(JSON.stringify(row));
+        } else {
+          console.log('done')
+          conn.query('CREATE TABLE if not exists login (id serial PRIMARY key, hash varchar(100) NOT null, email text UNIQUE NOT null);', (err) => {
+            done(err, conn);
+          })
         }
       });
-
     }
   }
 });
@@ -68,5 +59,3 @@ app.put('/image', (req, res) => { image.handleImage(req, res, db) })
 app.listen(PORT, () => {
   console.log(`App is running on port ${PORT}`)
 })
-
-console.log(process.env)
