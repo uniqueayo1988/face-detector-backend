@@ -12,10 +12,38 @@ const PORT = process.env.PORT || 8080
 const db = knex({
   client: 'pg',
   connection: {
-    host : '127.0.0.1',
-    user : '',
-    password : '',
-    database : 'template1'
+    // host : '127.0.0.1',
+    // user : '',
+    // password : '',
+    // database : 'template1'
+    host : 'ec2-174-129-255-76.compute-1.amazonaws.com',
+    user : 'uwsctihqxiplsv',
+    password : '479add8bb9db16574bfef35e566a8fbb2e1ea5d2e112247a1c9bff90f0660f14',
+    database : 'detnditgrq6o8q'
+  },
+  pool: {
+    afterCreate: function (conn, done) {
+      // in this example we use pg driver's connection API
+      // const userTable = create table `users` (`id` int unsigned not null auto_increment primary key, `name` varchar(255), `created_at` datetime, `updated_at` datetime)
+      // conn.query('SET timezone="UTC";', function (err) {
+      //   if (err) {
+      //     // first query failed, return error and don't try to make next query
+      //     done(err, conn);
+      //   }
+      // });
+
+      conn.query('SELECT table_schema,table_name FROM information_schema.tables;', function (err, res) {
+        if (err) {
+          console.log('There is an error in conn')
+          // first query failed, return error and don't try to make next query
+          done(err, conn);
+        }
+        for (let row of res.rows) {
+          console.log(JSON.stringify(row));
+        }
+      });
+
+    }
   }
 });
 
